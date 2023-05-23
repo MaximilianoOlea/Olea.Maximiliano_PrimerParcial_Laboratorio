@@ -1,0 +1,93 @@
+[
+  {
+    "ID": "1",
+    "Nombre": "Alimento Para Perros",
+    "Marca": "Pedigree",
+    "Precio": "12.99",
+    "Caracteristicas": "Sabor Delicioso~Nutrición Equilibrada~Contiene Vitaminas Y Minerales"
+  },
+  {
+    "ID": "2",
+    "Nombre": "Alimento Para Gatos",
+    "Marca": "Purina One",
+    "Precio": "9.99",
+    "Caracteristicas": "Alta Calidad~Proteínas De Primera~Promueve Un Pelaje Saludable"
+  },
+  {
+    "ID": "9",
+    "Nombre": "Alimento Para Perros",
+    "Marca": "Pro Plan",
+    "Precio": "18.50",
+    "Caracteristicas": "Ingredientes Naturales~Alta Digestibilidad~Para Todas Las Etapas De Vida"
+  },
+  {
+    "ID": "11",
+    "Nombre": "Alimento Para Gatos",
+    "Marca": "Science Diet",
+    "Precio": "16.99",
+    "Caracteristicas": "Fórmula Equilibrada~Control De Peso~Promueve La Salud Urinaria"
+  },
+  {
+    "ID": "15",
+    "Nombre": "Alimento Para Perros",
+    "Marca": "Blue Buffalo",
+    "Precio": "21.99",
+    "Caracteristicas": "Ingredientes Naturales~Sin Granos~Para Razas Pequeñas"
+  },
+  {
+    "ID": "18",
+    "Nombre": "Alimento Para Perros",
+    "Marca": "Iams",
+    "Precio": "14.50",
+    "Caracteristicas": "Control De Peso~Proteínas De Calidad~Sabor Delicioso"
+  },
+  {
+    "ID": "22",
+    "Nombre": "Alimento Para Gatos",
+    "Marca": "Wellness",
+    "Precio": "22.50",
+    "Caracteristicas": "Ingredientes Naturales~Alta Calidad~Promueve La Salud Digestiva~Sin Granos"
+  },
+  {
+    "ID": "25",
+    "Nombre": "Alimento Para Perros",
+    "Marca": "Nutro",
+    "Precio": "17.99",
+    "Caracteristicas": "Ingredientes De Calidad~Sin Conservantes Artificiales~Salud Digestiva"
+  },
+  {
+    "ID": "29",
+    "Nombre": "Alimento Para Gatos",
+    "Marca": "Royal Canin",
+    "Precio": "24.99",
+    "Caracteristicas": "Fórmula Específica Para Razas~Salud Digestiva~Pelo Brillante"
+  },
+  {
+    "ID": "32",
+    "Nombre": "Alimento Para Perros",
+    "Marca": "Pedigree",
+    "Precio": "19.50",
+    "Caracteristicas": "Ingredientes Naturales~Sin Granos~Salud Óptima"
+  },
+  {
+    "ID": "40",
+    "Nombre": "Alimento Para Peces",
+    "Marca": "Tetra",
+    "Precio": "5.99",
+    "Caracteristicas": "Variedad De Sabores~Alta Calidad Nutricional~Para Peces Tropicales"
+  },
+  {
+    "ID": "45",
+    "Nombre": "Alimento Para Perros",
+    "Marca": "Merrick",
+    "Precio": "23.99",
+    "Caracteristicas": "Ingredientes De Calidad~Sin Granos~Promueve Una Digestión Saludable"
+  },
+  {
+    "ID": "50",
+    "Nombre": "Alimento Para Perros",
+    "Marca": "Wellness Core",
+    "Precio": "29.99",
+    "Caracteristicas": "Alta Proteína~Ingredientes Naturales~Sin Granos~Salud Digestiva"
+  }
+]

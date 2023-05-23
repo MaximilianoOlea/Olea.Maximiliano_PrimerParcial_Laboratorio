@@ -48,9 +48,9 @@ def pet_parser_csv() -> list:
     for insumo in lineas:
         id = insumo[0]
         nombre = insumo[1]
-        marca = insumo[2]
+        marca = insumo[2].title()
         precio = insumo[3].replace("$","")
-        caracteristicas = insumo[4]
+        caracteristicas = insumo[4].title()
 
         lista_insumos.append({
             "ID": id,
@@ -70,10 +70,11 @@ def mostrar_insumo_fila(insumo: dict) -> None:
     Args:
         insumo: El insumo que quiere imprimirse
     """
-    print(f"""{insumo['ID']:4s}  {insumo['Nombre']}       {insumo['Marca']}      {insumo['Precio']}     {insumo['Caracteristicas']}""")
+    print(f"""{insumo['ID']:4s}  {insumo['Nombre']:35}       {insumo['Marca']:22}      ${insumo['Precio']:10}     {insumo['Caracteristicas']}""")
 
 def mostrar_insumo_titulo ()-> None:
-    print("ID       Nombre      Marca       Precio          Caracteristicas")
+    print("ID    Nombre                                    Marca                       Precio          Caracteristicas")
+
 def pet_listar_insumos(lista: list) -> None:
     """_summary_
     Se ingresa una lista de insumos y se imprime todos sus datos
@@ -244,6 +245,30 @@ def pet_insumo_por_caracteristica(lista:list)->bool:
 
 
 
+# ---------------------------Punto 5----------------------------------
+def ordenar_marca_precio(lista_a_ordenar: list) -> list:
+
+    lista = lista_a_ordenar.copy()
+    tam = len(lista)
+    for i in range(tam-1):
+        for j in range(i+1, tam):
+            # ordenar de manera ascendente (menor a mayor )
+            if (lista[i]["Marca"] == lista[j]["Marca"]) and (float(lista[i]["Precio"]) < float(lista[j]["Precio"])) or (lista[i]["Marca"] > lista[j]["Marca"]):
+                aux = lista[i]
+                lista[i] = lista[j]
+                lista[j] = aux
+
+    return lista
+
+# ------------------------Punto 7------------------------------------
+
+def pet_alimento_json(lista:list)->None:
+    with open ('Alimento.json', 'w', encoding='utf-8') as file:
+        for insumo in lista:
+            if (buscar_coincidencia_string("Alimento",insumo['Nombre'])):
+                json.dump(insumo, file, ensure_ascii=False, indent =2)
+    print ("Lista creada.")
+
 # --------------------Menu---------------------------------------
 def validar_entero(numero: str) -> bool:
     """ Valida si el string ingresado es un número
@@ -273,7 +298,7 @@ def imprimir_menu() -> None:
 5)Listar insumos ordenados.
 6)Realizar compras.
 7)Guardar Productos "alimento"(JSON).
-8)Listado de insumos (JSON).
+8)Listado de Productos "alimento"(JSON).
 9)Actualizar Precios.
 10)Salir.
 ----------------------------------------- """)
@@ -324,6 +349,11 @@ def pet_app() -> None:
                 pet_marca_nombre_precio(lista_insumos)
             case 4:
                 pet_insumo_por_caracteristica(lista_insumos)
+            case 5:
+                lista_ordenada_ascendente = ordenar_marca_precio(lista_insumos)
+                pet_listar_insumos(lista_ordenada_ascendente)
+            case 7: 
+                pet_alimento_json(lista_insumos)
             case 10:
                 print("HA SALIDO.")
                 break
