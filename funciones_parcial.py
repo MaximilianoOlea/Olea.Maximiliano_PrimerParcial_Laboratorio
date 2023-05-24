@@ -44,13 +44,13 @@ def pet_parser_csv() -> list:
         _type_: Returna una lista de diccionario con los insumos
     """
     lista_insumos = []
-    lineas = parser_csv("Primer_Parcial.py\\insumos.csv", ",")
+    lineas = parser_csv("insumos.csv", ",")
     for insumo in lineas:
         id = insumo[0]
         nombre = insumo[1]
-        marca = insumo[2].title()
-        precio = insumo[3].replace("$","")
-        caracteristicas = insumo[4].title()
+        marca = insumo[2]
+        precio = insumo[3]
+        caracteristicas = insumo[4]
 
         lista_insumos.append({
             "ID": id,
@@ -62,6 +62,14 @@ def pet_parser_csv() -> list:
 
     return lista_insumos
 
+def pet_normalizar_datos (lista:list)->list:
+
+    for insumo in lista:
+        insumo["ID"] = int(insumo["ID"])
+        insumo["Nombre"] =  insumo["Nombre"].title()
+        insumo["Marca"] = insumo["Marca"].title()
+        insumo["Precio"] = float(insumo["Precio"].replace("$", ""))
+        insumo["Caracteristicas"] = insumo["Caracteristicas"].title()
 
 def mostrar_insumo_fila(insumo: dict) -> None:
     """
@@ -70,7 +78,7 @@ def mostrar_insumo_fila(insumo: dict) -> None:
     Args:
         insumo: El insumo que quiere imprimirse
     """
-    print(f"""{insumo['ID']:4s}  {insumo['Nombre']:35}       {insumo['Marca']:22}      ${insumo['Precio']:10}     {insumo['Caracteristicas']}""")
+    print(f"""{insumo['ID']:<4d}  {insumo['Nombre']:35}       {insumo['Marca']:22}      ${insumo['Precio']:>7.2f}     {insumo['Caracteristicas']}""")
 
 def mostrar_insumo_titulo ()-> None:
     print("ID    Nombre                                    Marca                       Precio          Caracteristicas")
@@ -260,14 +268,186 @@ def ordenar_marca_precio(lista_a_ordenar: list) -> list:
 
     return lista
 
+
+
+# -----------------------Punto 6------------------------------------
+
+def obtener_primer_caracteristica(insumo: dict) -> str:
+    """_summary_
+    De un insumo[caracteristicas] se obtiene la primer coincidencia hasta encontrar un simbolo
+    Args:   
+        insumo (dict): Insumo del que se va a obtener la primer caracteristica
+
+    Returns:
+        str: Devuelve la primera caracteristica obtenida en forma de string
+    """
+    string = ""
+    patron = re.compile("[\w\s]+")
+    match = patron.match (f"{insumo['Caracteristicas']}")
+
+    if (match):
+        string = match.group()+"."
+
+    return string
+
+def cargar_lista_primer_caracteristica(lista)->list:
+    lista_copia = lista.copy()
+
+    for insumo in lista_copia:
+        insumo["Caracteristicas"] = obtener_primer_caracteristica(insumo)
+
+    return lista_copia
+
+def comprar(lista: list) -> list:
+    factura = []
+
+    lista_copia = cargar_lista_primer_caracteristica(lista)
+    pet_listar_insumos(lista_copia)
+    acumulador_total = 0
+    while True:
+        marca_a_buscar = input(
+            "Ingrese una marca: ('Salir para finalizar')").title()
+
+        if marca_a_buscar == "Salir":
+            break
+
+        lista_marca_coincidencia = filtrar_lista_lambda(
+            lista_copia, lambda insumo: insumo if buscar_coincidencia_string(marca_a_buscar, insumo['Marca']) else None)
+        os.system("cls")
+        if lista_marca_coincidencia:
+            acumulador_subtotal = 0.0
+            print("Lista de productos de esa marca:\n")
+            pet_listar_insumos(lista_marca_coincidencia)
+            while (True):
+                producto = input(
+                    "Ingrese nombre del producto: ('Salir para finalizar')").title()
+                if producto == "Salir":
+                    print(
+                        f"La cantidad total de su compra es : ${acumulador_subtotal:.2f}")
+                    break
+
+                lista_nombre_coincidencia = filtrar_lista_lambda(
+                    lista_marca_coincidencia, lambda insumo: insumo if buscar_coincidencia_string(producto, insumo['Nombre']) else None)
+
+                pet_listar_insumos(lista_nombre_coincidencia)
+                if (len(lista_nombre_coincidencia) > 1):
+
+                    producto_caracteristica = input(
+                        "Hay más de un producto con ese nombre. Especique su caracteristica: ")
+                    for producto in lista_nombre_coincidencia:
+                        if buscar_coincidencia_string(producto_caracteristica, producto["Caracteristicas"]):                            
+                            cantidad = int(
+                                input("Ingrese cuantas unidades quiere: "))
+                            factura.append (f"Nombre del producto: {producto['Nombre']}({producto['Marca']})")
+                            factura.append (f"{cantidad}u  x  ${lista_nombre_coincidencia[0]['Precio']:.2f}              ${acumulador_subtotal}")
+                            acumulador_subtotal += cantidad * \
+                                producto["Precio"]                   
+
+                elif (len(lista_nombre_coincidencia) == 1):
+                    cantidad = int(input("Ingrese cuantas unidades quiere: "))
+                    acumulador_subtotal += cantidad * \
+                        lista_nombre_coincidencia[0]["Precio"]
+                    factura.append (f"Nombre del producto: {lista_nombre_coincidencia[0]['Nombre']}({lista_nombre_coincidencia[0]['Marca']})")
+                    factura.append (f"{cantidad}u  x  ${lista_nombre_coincidencia[0]['Precio']:.2f}              ${acumulador_subtotal}")                    
+
+                print("Subtotal :$", acumulador_subtotal)
+
+
+                acumulador_total += acumulador_subtotal
+        else:
+            print("No se encontró la marca")
+    print("Total :$", acumulador_total)
+    factura.append (f"Total :                   ${acumulador_total:.2f}") 
+
+    return factura
+
+def crear_txt(lista:list) -> None:
+
+    archivo = open("factura.txt", "w")
+    with open("factura.txt", "w") as archivo:
+        for linea in lista:
+            archivo.write(linea + "\n")
+
+    print("Factura guardada en factura.txt")
 # ------------------------Punto 7------------------------------------
 
-def pet_alimento_json(lista:list)->None:
-    with open ('Alimento.json', 'w', encoding='utf-8') as file:
-        for insumo in lista:
-            if (buscar_coincidencia_string("Alimento",insumo['Nombre'])):
-                json.dump(insumo, file, ensure_ascii=False, indent =2)
-    print ("Lista creada.")
+def convertir_lista_pretty_a_json(lista:list,path:str)->None:
+    """_summary_
+    Se guarda una lista a un archivo.json (indentado)
+    Args:
+        lista (list): Lista que se va a pasar a un archivo json
+        path (str): Direccion en la que va a guardarse el json
+    """
+
+    with open (path, 'w', encoding='utf-8') as file:
+        json.dump(lista, file, ensure_ascii=False, indent =2, separators=(", ", " : "))   
+
+def filtrar_lista_lambda (lista:list,condicion)->list:
+    """_summary_
+    Filtra una lista dependiendo de la condicion lambda que se pase
+    Args:
+        lista (list): Lista que se va a filtrar
+        condicion (_type_): Desarrollo de una funcion lambda (que filtre la lista)
+
+    Returns:
+        list: Devuelve una lista filtrada
+    """
+    lista_filtrada = list(filter (condicion,lista))
+
+    return lista_filtrada
+
+def pet_convertir_lista_alimento_json(lista:list,nombre_archivo_json:str)->None:
+    """_summary_
+    Se recibe la lista y se filtrara aquellos que tengan caracteristica "Alimento" y se carga a un archivo json
+    Args:
+        lista (list): Lista filtrada por la caracteristica "Alimento"
+        nombre_archivo_json (str): Nombre que va a tener el archivo 
+    """
+    # Filtré la lista
+    lista_alimentos = filtrar_lista_lambda(lista, lambda insumo: insumo if buscar_coincidencia_string("Alimento", insumo['Nombre']) else None)
+        
+    convertir_lista_pretty_a_json(lista_alimentos,f"{nombre_archivo_json}.json")
+    print (f"Se cargó el archivo '{nombre_archivo_json}' a un .json")
+
+
+# -----------------------Punto 8----------------------------------
+
+def pet_cargar_lista_desde_json(ruta_archivo:str)->list:
+    with open (ruta_archivo, 'r',encoding='utf-8') as file:
+        contenido = file.read()
+        lista = json.loads(contenido)
+    
+# -------------------Punto 9 ---------------------------------------
+
+def aplicar_aumento(lista:list)->list:
+    """_summary_
+    Recibe una lista y devuelve otra lista con el precio aumentado un 8%
+    Args:
+        lista (list): Lista a la que va a aplicarse el descuento
+
+    Returns:
+        list: lista con aumento en la key (precio)
+    """
+    lista_copia = lista.copy()
+    for insumo in lista_copia:
+        insumo["Precio"] += insumo["Precio"] * 0.84
+    return lista_copia
+
+def pet_guardar_lista_csv(lista, nombre_archivo):
+    # Obtenemos los nombres de las columnas del primer diccionario
+    columnas = lista[0].keys()
+
+    with open(nombre_archivo, 'w', newline='',encoding='utf-8') as file:
+        writer = csv.DictWriter(file, fieldnames=columnas)
+
+        # Escribimos los nombres de las columnas en la primera fila
+        writer.writeheader()
+
+        # Escribimos cada diccionario como una fila en el archivo CSV
+        for item in lista:
+            writer.writerow(item)
+    
+    print ("\nSe ha creado la lista en un archivo csv.\n")
 
 # --------------------Menu---------------------------------------
 def validar_entero(numero: str) -> bool:
@@ -337,10 +517,11 @@ def pet_app() -> None:
 
             case 1:
                 # Cargar datos dsde archivo csv
-                lista_insumos = pet_parser_csv()
+                lista_insumos = pet_parser_csv()        
                 flag_carga = True
+                pet_normalizar_datos(lista_insumos)
                 pet_listar_insumos(lista_insumos)
-            
+
             case 2:
                 lista_marcas = proyectar_insumo(lista_insumos,"Marca")
                 lista_marcas_repetidos = proyectar_insumo(lista_insumos,"Marca",True)
@@ -352,8 +533,18 @@ def pet_app() -> None:
             case 5:
                 lista_ordenada_ascendente = ordenar_marca_precio(lista_insumos)
                 pet_listar_insumos(lista_ordenada_ascendente)
+            case 6:
+                factura = comprar(lista_insumos)
+                crear_txt(factura)
             case 7: 
-                pet_alimento_json(lista_insumos)
+                pet_convertir_lista_alimento_json(lista_insumos,"Alimento")
+            case 8:      
+                pet_listar_insumos(pet_cargar_lista_desde_json("Alimento.json"))
+            case 9:
+                lista_con_aumento = aplicar_aumento (lista_insumos)
+                pet_guardar_lista_csv(lista_con_aumento,"insumos_aumento.csv")
+
+                pet_listar_insumos(lista_con_aumento)
             case 10:
                 print("HA SALIDO.")
                 break

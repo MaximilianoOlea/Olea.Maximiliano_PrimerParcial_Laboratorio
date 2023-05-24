@@ -1,0 +1,5 @@
+Nombre del producto: Corral Para Mascotas
+3u  x  $39.99              $119.97
+Nombre del producto: Cama Para Perros
+4u  x  $29.99              $119.96
+Total :                   $239.93
