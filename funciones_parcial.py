@@ -449,6 +449,175 @@ def pet_guardar_lista_csv(lista, nombre_archivo):
     
     print ("\nSe ha creado la lista en un archivo csv.\n")
 
+
+# ---------------------Punto 10--------------------------------
+def cargar_lista_desde_txt(path:str)->list:
+    """_summary_
+    Recibe una direccion con un archivo.txt y lo transforma en lista
+    Args:
+        path (str): direccion del archivo
+
+    Returns:
+        list: lista extraida del archivo
+    """
+
+    with open(path, 'r') as file:
+        contenido = file.read()
+        lista = contenido.split('\n')
+    return lista
+
+def mostrar_lista_fila (lista:list,title:str = "-")->None:
+    """_summary_
+    Recibe una lista y la muestra con un salto de linea y con un titulo
+    Args:
+        lista (list): Lista que quiere mostrarse
+        title (str, optional): Cabecera de la lista
+    """
+    print (f"\n-------------------{title}-------------------\n")
+
+    for marca in lista:
+        print (marca)
+
+def mostrar_especificaciones_fila (lista:list,title:str = "-")->None:
+    """_summary_
+    Recibe un producto agregado y lo printea
+    Args:
+        lista (list): Especificaciones del producto
+        title (str, optional): Cabecera de la lista
+    """
+
+    print (f"\n-------------------{title}-------------------\n")
+    
+    print (f"Marca : {lista[0]}\nNombre: {lista[1]}\nPrecio: ${lista[2]}\nCaracteristicas: {lista[3]}")
+
+
+def validar_marca (lista_marcas:list)->str:
+    """_summary_
+    Recibe la lista de marcas extraida del txt y valida que el usuario ingreso una que corresponda a la lista
+    Args:
+        lista_marcas (list): Lista de marcas extraidas del txt
+
+    Returns:
+        str: Devuelve lo que escribio el usuario (Si no se validó la marca devuelve un string vacio)
+    """
+    flag_encontro = False
+
+    while True:
+        mostrar_lista_fila (lista_marcas,"Marcas disponibles:")
+
+        marca = input("Ingrese marca que desea agregar ('Salir' para cancelar): ").title()
+        if (marca) == "Salir":
+            return ""
+
+        for insumo in lista_marcas:
+            if insumo == marca:
+                flag_encontro = True
+                break
+
+        if flag_encontro:
+            if(input(f"Presiona 's' para confirmar la marca: ({insumo})\n").lower() == "s"):
+                return insumo
+            else:
+                print("Se cancelo la acción.")
+        else:
+            print("La marca ingresada no está disponible")
+
+def validar_producto (lista_marcas:list)->list:
+    """_summary_
+    Valida los datos correspondientes del producto que quiere agregarse
+    Args:
+        lista_marcas (list): Lista de marcas disponibles
+
+    Returns:
+        list: Devuelve una lista con las especificaciones del producto (Si no se valida devuelve una lista vacia)
+    """
+    marca_validada = validar_marca(lista_marcas)
+    especificaciones = []
+    if marca_validada:
+        especificaciones.append (marca_validada)
+        nombre = input ("Ingrese nombre del producto: ").title()
+        especificaciones.append(nombre)
+        
+        while True:
+            try:
+                precio = float(input("Ingrese precio del producto: "))
+                especificaciones.append(precio)
+                break
+            except ValueError:
+                print ("Eso no es un numero")
+
+        contador = 3
+        while (contador>1):
+            contador -= 1
+            
+            if (contador == 2):
+                caracteristicas = input("Ingrese caracteristicas del producto: ").title()
+                if caracteristicas:
+                    especificaciones.append(caracteristicas)
+                    respuesta = input("Presione 's' para agregar otra caracteristica.").lower()
+                else:
+                    print ("Debe ingresar al menos una caracteristica")
+                if (respuesta != "s" or respuesta == " "):
+                    break                    
+            else :
+                caracteristicas = input("Ingrese caracteristicas del producto: ").title()
+                if caracteristicas:
+                    especificaciones.insert(-1, caracteristicas)
+                    respuesta = input("Presione 's' para agregar otra caracteristica.").lower()                
+                else:
+                    break        
+            if (respuesta != "s" or respuesta == ""):
+                break
+       
+    return especificaciones
+    
+def buscar_ultima_id (lista:list)->int:
+    """_summary_
+    De la lista recibida busca el ultimo elemento y subtrae la id
+    Args:
+        lista (list): Lista de la que va a buscarse la id
+
+    Returns:
+        int: Devuelve la id encontrada
+    """
+    return lista[-1]["ID"]
+
+def crear_insumo_dict (marca:str,nombre:str,precio:float,caracteristicas:str,lista_id:list)->dict:
+    """_summary_
+    Recibe los datos de un insumo y los transforma a un diccionario con su respectiva key
+    Args:
+        marca (str): Marca del insumo
+        nombre (str): Nombre del insumo
+        precio (float): Precio del insumo
+        caracteristicas (str): Caracteristicas del insumo
+        lista_id (list): Lista de la cual va a buscarse la ultima id
+
+    Returns:
+        dict: Devuelve un diccionario del insumo
+    """
+    
+    insumo_dict ={
+            "ID": buscar_ultima_id(lista_id)+1,
+            "Nombre": nombre,
+            "Marca": marca,
+            "Precio": precio,
+            "Caracteristicas": caracteristicas,
+        }
+    
+    return insumo_dict
+
+def pet_agregar_insumo_a_lista (lista_marcas:list,lista:list)->None:
+    """_summary_
+        Agrega un insumo a la lista
+    Args:
+        lista_marcas (list): Lista de marcas disponibles
+        lista (list): Lista a la cual va a agregarse el nuevo insumo
+    """
+    especificaciones_del_producto = validar_producto(lista_marcas)
+    if especificaciones_del_producto:
+        lista.append(crear_insumo_dict(especificaciones_del_producto[0],especificaciones_del_producto[1],especificaciones_del_producto[2],especificaciones_del_producto[3],lista))
+        mostrar_especificaciones_fila (especificaciones_del_producto,"Producto que agregó")
+
 # --------------------Menu---------------------------------------
 def validar_entero(numero: str) -> bool:
     """ Valida si el string ingresado es un número
@@ -480,7 +649,9 @@ def imprimir_menu() -> None:
 7)Guardar Productos "alimento"(JSON).
 8)Listado de Productos "alimento"(JSON).
 9)Actualizar Precios.
-10)Salir.
+10)Agregar un producto nuevo.
+11)Guardar todos los datos actualizados (En json o csv)
+12)Salir.
 ----------------------------------------- """)
 
 
@@ -491,6 +662,8 @@ def pet_menu_principal() -> int:
     Returns:
         int: retorna el numero ingresado o -1(si no ingresó numero)
     """
+
+    flag_carga = False
     imprimir_menu()
     opcion = input("Ingrese opción: ")
     if validar_entero(opcion):
@@ -523,29 +696,71 @@ def pet_app() -> None:
                 pet_listar_insumos(lista_insumos)
 
             case 2:
-                lista_marcas = proyectar_insumo(lista_insumos,"Marca")
-                lista_marcas_repetidos = proyectar_insumo(lista_insumos,"Marca",True)
-                contar_coincidencias_lista(lista_marcas,lista_marcas_repetidos)
+                if flag_carga:
+                    lista_marcas = proyectar_insumo(lista_insumos,"Marca")
+                    lista_marcas_repetidos = proyectar_insumo(lista_insumos,"Marca",True)
+                    contar_coincidencias_lista(lista_marcas,lista_marcas_repetidos)
+                else:
+                    print ("Debe cargar la lista en la opcion 1")
             case 3:
-                pet_marca_nombre_precio(lista_insumos)
+                if flag_carga:
+                    pet_marca_nombre_precio(lista_insumos)
+                else:
+                    print ("Debe cargar la lista en la opcion 1")
             case 4:
-                pet_insumo_por_caracteristica(lista_insumos)
+                if flag_carga:
+                    pet_insumo_por_caracteristica(lista_insumos)
+                else:
+                    print ("Debe cargar la lista en la opcion 1")    
             case 5:
-                lista_ordenada_ascendente = ordenar_marca_precio(lista_insumos)
-                pet_listar_insumos(lista_ordenada_ascendente)
+                if flag_carga:
+                    lista_ordenada_ascendente = ordenar_marca_precio(lista_insumos)
+                    pet_listar_insumos(lista_ordenada_ascendente)
+                else:
+                    print ("Debe cargar la lista en la opcion 1")
             case 6:
-                factura = comprar(lista_insumos)
-                crear_txt(factura)
+                if flag_carga:
+                    factura = comprar(lista_insumos)
+                    crear_txt(factura)
+                else:
+                    print ("Debe cargar la lista en la opcion 1")
             case 7: 
-                pet_convertir_lista_alimento_json(lista_insumos,"Alimento")
-            case 8:      
-                pet_listar_insumos(pet_cargar_lista_desde_json("Alimento.json"))
-            case 9:
-                lista_con_aumento = aplicar_aumento (lista_insumos)
-                pet_guardar_lista_csv(lista_con_aumento,"insumos_aumento.csv")
+                if flag_carga:
 
-                pet_listar_insumos(lista_con_aumento)
+                    pet_convertir_lista_alimento_json(lista_insumos,"Alimento")
+                else:
+                    print ("Debe cargar la lista en la opcion 1")
+            case 8: 
+                if flag_carga:
+                    pet_listar_insumos(pet_cargar_lista_desde_json("Alimento.json"))
+                else:
+                    print ("Debe cargar la lista en la opcion 1")                    
+            case 9:
+                if flag_carga:                
+                    lista_con_aumento = aplicar_aumento (lista_insumos)
+                    pet_guardar_lista_csv(lista_con_aumento,"insumos_aumento.csv")  
+                    pet_listar_insumos(lista_con_aumento)
+                else:
+                    print ("Debe cargar la lista en la opcion 1")          
             case 10:
+                lista_marcas = (cargar_lista_desde_txt ("marcas.txt"))
+                pet_agregar_insumo_a_lista(lista_marcas,lista_insumos)
+            case 11:              
+                respuesta = input("Ingrese el numero de la opcion:\n1)Guardar CSV.\n2)Guardar JSON\n")
+
+                if respuesta == "1":
+                    nombre_archivo = input("Ingrese nombre del archivo: ")
+                    nombre_archivo = nombre_archivo + ".csv"
+                    pet_guardar_lista_csv(lista_insumos,nombre_archivo)
+                    print ("Datos guardados en csv")
+                elif respuesta == "2":
+                    nombre_archivo = input("Ingrese nombre del archivo: ")
+                    nombre_archivo = nombre_archivo + ".json"
+                    convertir_lista_pretty_a_json(lista_insumos,nombre_archivo)
+                    print ("Datos guardados en json")
+                else:
+                    print ("Opcion invalida")
+            case 12:
                 print("HA SALIDO.")
                 break
 

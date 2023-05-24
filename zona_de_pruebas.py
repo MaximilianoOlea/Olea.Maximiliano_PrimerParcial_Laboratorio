@@ -366,6 +366,107 @@ def guardar_lista_csv(lista, nombre_archivo):
         for item in lista:
             writer.writerow(item)
 
+def cargar_lista_desde_txt(path:str)->list:
+
+    with open(path, 'r') as file:
+        contenido = file.read()
+        lista = contenido.split('\n')
+    return lista
+
+def mostrar_lista_fila (lista:list,title:str)->None:
+
+    print (f"\n-------------------{title}-------------------\n")
+
+    for insumo in lista:
+        print (insumo)
+
+def validar_marca (lista_marcas:list)->str:
+    flag_encontro = False
+
+    lista_marcas_coincidencias = []
+    while True:
+        mostrar_lista_fila (lista_marcas,"Marcas disponibles:")
+
+        marca = input("Ingrese marca que desea agregar ('Salir' para cancelar): ").title()
+        if (marca) == "Salir":
+            return ""
+
+        for insumo in lista_marcas:
+            if insumo == marca:
+                flag_encontro = True
+                break
+
+        if flag_encontro:
+            if(input(f"Presiona 's' para confirmar la marca: ({insumo})\n").lower() == "s"):
+                return insumo
+            else:
+                print("Se cancelo la acción.")
+        else:
+            print("La marca ingresada no está disponible")
+
+def validar_producto (lista_marcas)->list:
+    marca_validada = validar_marca(lista_marcas)
+    especificaciones = []
+    if marca_validada:
+        especificaciones.append (marca_validada)
+        nombre = input ("Ingrese nombre del producto: ").title()
+        especificaciones.append(nombre)
+        
+        while True:
+            try:
+                precio = float(input("Ingrese precio del producto: "))
+                especificaciones.append(precio)
+                break
+            except ValueError:
+                print ("Eso no es un numero")
+
+        contador = 3
+        while (contador>1):
+            contador -= 1
+            
+            if (contador == 2):
+                caracteristicas = input("Ingrese caracteristicas del producto: ").title()
+                if caracteristicas:
+                    especificaciones.append(caracteristicas)
+                    respuesta = input("Presione 's' para agregar otra caracteristica.").lower()
+                else:
+                    print ("Debe ingresar al menos una caracteristica")
+                if (respuesta != "s" or respuesta == " "):
+                    break                    
+            else :
+                caracteristicas = input("Ingrese caracteristicas del producto: ").title()
+                if caracteristicas:
+                    especificaciones.insert(-1, caracteristicas)
+                    respuesta = input("Presione 's' para agregar otra caracteristica.").lower()                
+                else:
+                    break        
+            if (respuesta != "s" or respuesta == ""):
+                break
+       
+    return especificaciones
+    
+def buscar_ultima_id (lista:list)->int:
+    return lista[-1]["ID"]
+
+def crear_insumo_dict (marca:str,nombre:str,precio:float,caracteristicas:str,lista_id:list)->dict:
+    
+    insumo_dict ={
+            "ID": buscar_ultima_id(lista_id)+1,
+            "Nombre": nombre,
+            "Marca": marca,
+            "Precio": precio,
+            "Caracteristicas": caracteristicas,
+        }
+    
+    return insumo_dict
+
+def pet_agregar_insumo_a_lista (lista_marcas:list,lista:list)->None:
+    especificaciones_del_producto = validar_producto(lista_marcas)
+    if especificaciones_del_producto:
+        lista.append(crear_insumo_dict(especificaciones_del_producto[0],especificaciones_del_producto[1],especificaciones_del_producto[2],especificaciones_del_producto[3],lista))
+    
+
+
 
 # -----------------------------------------------------------------------
 lista = pet_parser_csv()
@@ -383,6 +484,8 @@ pet_normalizar_datos(lista)
 
 # guardar_lista_csv(lista_aumento,"insumos_aumento.csv")
 
-factura = comprar(lista)
+lista_marcas = (cargar_lista_desde_txt ("marcas.txt"))
 
-crear_txt(factura)
+
+
+pet_listar_insumos(lista)
